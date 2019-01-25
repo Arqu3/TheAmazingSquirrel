@@ -56,8 +56,6 @@ public class CameraMovement : MonoBehaviour
         }
     }
 
-    Transform overrideLookatTarget;
-
     #endregion
 
     private void Awake()
@@ -135,17 +133,13 @@ public class CameraMovement : MonoBehaviour
 
     private void LateUpdate()
     {
-        //if (Input.GetKeyDown(KeyCode.Alpha1)) SetMode(Mode.Static);
-        //else if (Input.GetKeyDown(KeyCode.Alpha2)) SetMode(Mode.ThirdPerson);
-        //else if (Input.GetKeyDown(KeyCode.Alpha3)) SetMode(Mode.FirstPerson);
-
         if (mode == Mode.Static)
         {
             transform.position = target.position + staticOffset;
         }
         else
         {
-            Vector2 rotation = overrideLookatTarget ? Vector2.zero : RotationInput;
+            Vector2 rotation = RotationInput;
 
             float maxAngle = 80f;
 
@@ -190,71 +184,9 @@ public class CameraMovement : MonoBehaviour
         //Camera.main.transform.LookAt(followTransform.position + followTransform.forward * dist);
         //Debug.DrawRay(Camera.main.transform.position, Camera.main.transform.forward * dist, Color.red);
 
-        if (overrideLookatTarget)
-        {
-            Vector3 dir = overrideLookatTarget.position - Camera.main.transform.position;
-            Quaternion toRot = Quaternion.LookRotation(dir);
-            Camera.main.transform.rotation = Quaternion.RotateTowards(Camera.main.transform.rotation, toRot, 300f * Time.deltaTime);
-            Vector3 euler = Camera.main.transform.rotation.eulerAngles;
-            euler.z = 0f;
-            Camera.main.transform.rotation = Quaternion.Euler(euler);
-        }
-        else
-        {
-            Vector3 dir = (followTransform.position + followTransform.forward * dist) - Camera.main.transform.position;
-            Camera.main.transform.rotation = Quaternion.LookRotation(dir);
-        }
+        Vector3 dir = ( followTransform.position + followTransform.forward * dist ) - Camera.main.transform.position;
+        Camera.main.transform.rotation = Quaternion.LookRotation (dir);
 
-        //Vector3 rot = Camera.main.transform.localRotation.eulerAngles;
-        //rot.z = 0f;
-        //Camera.main.transform.localRotation = Quaternion.Euler(rot);
-    }
-
-    //void UpdateRenderer(bool enabled)
-    //{
-    //    Renderer rend = target.GetComponent<Renderer>();
-    //    if (rend)
-    //    {
-    //        rend.enabled = enabled;
-    //        rend.GetComponentsInChildren<Renderer>().ToList().ForEach(x => x.enabled = enabled);
-    //    }
-    //}
-
-    //public void Lock(bool changeCursorstate = true)
-    //{
-    //    ++locks;
-    //    if (changeCursorstate)
-    //    {
-    //        Cursor.lockState = CursorLockMode.None;
-    //        Cursor.visible = true;
-    //    }
-    //}
-
-    //public void Unlock(bool changeCursorstate = true)
-    //{
-    //    locks = Mathf.Clamp(locks - 1, 0, locks + 1);
-    //    if (locks == 0 && changeCursorstate)
-    //    {
-    //        Cursor.lockState = CursorLockMode.Locked;
-    //        Cursor.visible = false;
-    //    }
-    //}
-
-    /// <summary>
-    /// Overrides what the camera should look at, set to null to reset
-    /// </summary>
-    /// <param name="target"></param>
-    public void SetOverrideLookatTarget(Transform target)
-    {
-        //if (target) StartCoroutine(_SetOverrideTargetDelayed(target));
-        //else overrideLookatTarget = target;
-    }
-
-    private IEnumerator _SetOverrideTargetDelayed(Transform target)
-    {
-        yield return new WaitForSeconds(3f);
-
-        overrideLookatTarget = target;
     }
 
     public void ResetRotation()

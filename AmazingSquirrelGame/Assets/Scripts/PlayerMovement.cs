@@ -183,7 +183,7 @@ public class PlayerMovement : MonoBehaviour, IMovement
         if (locks <= 0) body.AddForce(input);
         if (!grounded) body.AddForce(Vector3.down * 75f);
 
-        animator.SetFloat("Speed", body.velocity.magnitude / 12f);
+        animator?.SetFloat("Speed", body.velocity.magnitude / 12f);
 
         AddDrag();
         ProjectVelocityIfGrounded();
@@ -231,7 +231,7 @@ public class PlayerMovement : MonoBehaviour, IMovement
         if (forward.sqrMagnitude < 0.1f) return;
 
         var a = body.rotation;
-        var b = Quaternion.LookRotation(locks > 0 ? lockForward : forward, Vector3.up);
+        var b = Quaternion.LookRotation(locks > 0 ? lockForward : forward, GroundNormal);
         var ang = Quaternion.Angle(a, b) / 180;
         body.MoveRotation(Quaternion.RotateTowards(a, b, Mathf.Lerp(1f, 20f, ang * ang) * turnspeed * Time.fixedDeltaTime));
         //transform.localRotation = Quaternion.RotateTowards(a, b, Mathf.Clamp(0.3f, 1f, ang) * turnspeed * Time.fixedDeltaTime); //Quaternion.SlerpUnclamped (transform.localRotation, Quaternion.LookRotation (locks > 0 ? lockForward : forward, Vector3.up), turnspeed * Time.fixedDeltaTime);
@@ -266,7 +266,6 @@ public class PlayerMovement : MonoBehaviour, IMovement
 
     public void Lock(Vector3 forward)
     {
-        //cameraMovement.Lock(false);
         ++locks;
         lockForward = forward;
     }
@@ -274,7 +273,6 @@ public class PlayerMovement : MonoBehaviour, IMovement
     public void Unlock()
     {
         locks = Mathf.Clamp(locks - 1, 0, locks + 1);
-        //cameraMovement.Unlock(false);
     }
 
     public void ResetPositionAndRotation()
@@ -301,8 +299,6 @@ public class PlayerMovement : MonoBehaviour, IMovement
         set
         {
             enabled = value;
-
-            if (!value) cameraMovement.SetOverrideLookatTarget(animator.GetComponentInChildren<Rigidbody>(true).transform);
         }
     }
 }
