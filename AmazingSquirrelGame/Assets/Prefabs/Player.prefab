@@ -91,6 +91,7 @@ GameObject:
   - component: {fileID: 3470181320141513184}
   - component: {fileID: 3470181320141513191}
   - component: {fileID: 3470181320141513190}
+  - component: {fileID: 8160685904592819971}
   m_Layer: 0
   m_Name: Player
   m_TagString: Untagged
@@ -205,7 +206,21 @@ MonoBehaviour:
   dragExponent: 0.2
   sprintMultiplier: 5
   turnspeed: 100
+  jumpStrength: 1500
   cameraMovement: {fileID: 276268222253651711}
+--- !u!114 &8160685904592819971
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3470181320141513189}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e2403e85043c8894bad30192508cf4d3, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  interactRange: 10
 --- !u!1 &6897410154772145544
 GameObject:
   m_ObjectHideFlags: 0
