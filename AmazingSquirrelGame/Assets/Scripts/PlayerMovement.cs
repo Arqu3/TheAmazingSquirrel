@@ -95,7 +95,6 @@ public class PlayerMovement : MonoBehaviour, IMovement
 
                     i = transform.rotation * i;
 
-
                     break;
                 case CameraMovement.Mode.FirstPerson:
 
@@ -108,18 +107,6 @@ public class PlayerMovement : MonoBehaviour, IMovement
 
             return isActive ? Vector3.ClampMagnitude(i, 1f) * speed : Vector3.zero;
         }
-    }
-
-    public bool Slowed
-    {
-        get;
-        set;
-    }
-
-    public bool Sprinting
-    {
-        get;
-        set;
     }
 
     #endregion
@@ -135,14 +122,6 @@ public class PlayerMovement : MonoBehaviour, IMovement
     #region Private variables
 
     bool grounded = false;
-
-    public bool SprintInputActive
-    {
-        get
-        {
-            return Input.GetKey (KeyCode.LeftShift);
-        }
-    }
 
     Transform cameraRotationTransform;
 
@@ -168,9 +147,6 @@ public class PlayerMovement : MonoBehaviour, IMovement
 
     private void Start()
     {
-        Slowed = false;
-        Sprinting = false;
-
         cameraRotationTransform = cameraMovement.GetRotationTransform();
     }
 
@@ -180,34 +156,21 @@ public class PlayerMovement : MonoBehaviour, IMovement
 
         Vector3 input = InputVector;
 
-        UpdateRotation(Vector3.ProjectOnPlane(cameraRotationTransform.forward, groundNormal).normalized);
+        UpdateRotation (Vector3.ProjectOnPlane (Camera.main.transform.forward, groundNormal).normalized);
 
-        Sprinting = SprintInputActive;
-
-        if (Slowed) input *= 0.1f;
-        else if (Sprinting) input *= sprintMultiplier;
-        if (locks <= 0) body.AddForce(input);
+        //if (Slowed) input *= 0.1f;
+        if (Input.GetKey(KeyCode.LeftShift)) input *= sprintMultiplier;
+        //if (locks <= 0) body.AddForce(input);
         if (!grounded) body.AddForce(Vector3.down * 75f);
+        else body.AddForce (-transform.up * 20f);
 
-        body.AddForce (-transform.up * 20f);
+        body.MovePosition (body.position + (input * Time.fixedDeltaTime * 0.05f));
 
         animator?.SetFloat("Speed", body.velocity.magnitude / 12f);
 
         AddDrag();
         ProjectVelocityIfGrounded();
     }
-
-    //private void Update()
-    //{
-    //    if (animator != null && !body.isKinematic)
-    //    {
-    //        if (Input.GetKeyDown(KeyCode.LeftControl) && isActive) animator.SetBool("Is Crouching", !animator.GetBool("Is Crouching"));
-
-    //        animator.SetFloat("movement forward", Mathf.Clamp(Vector3.Dot(Vector3.ProjectOnPlane(cameraMovement.transform.right, Vector3.up).normalized, body.velocity), -1, 1));
-    //        animator.SetFloat("movement right", Mathf.Clamp(Vector3.Dot(Vector3.ProjectOnPlane(cameraMovement.transform.forward, Vector3.up).normalized, body.velocity), -1, 1));
-    //        animator.SetFloat("VelocityMagnitude", Mathf.Max(body.velocity.magnitude * 0.5f, 1));
-    //    }
-    //}
 
     void AddDrag()
     {

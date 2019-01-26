@@ -141,7 +141,7 @@ public class CameraMovement : MonoBehaviour
         {
             Vector2 rotation = RotationInput;
 
-            float maxAngle = 80f;
+            float maxAngle = 70f;
 
             if (storedRotation.x < maxAngle && rotation.x > 0f) storedRotation.x += rotation.x;
             else if (storedRotation.x > -maxAngle && rotation.x < 0f) storedRotation.x += rotation.x;

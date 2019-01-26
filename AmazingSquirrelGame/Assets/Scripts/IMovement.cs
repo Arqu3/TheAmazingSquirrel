@@ -16,23 +16,6 @@ public interface IMovement
         get;
     }
 
-    bool SprintInputActive
-    {
-        get;
-    }
-
-    bool Sprinting
-    {
-        get;
-        set;
-    }
-
-    bool Slowed
-    {
-        get;
-        set;
-    }
-
     bool Enabled
     {
         get;
