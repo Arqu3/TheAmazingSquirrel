@@ -32,10 +32,22 @@ public class PlayerMovement : MonoBehaviour, IMovement
     [SerializeField]
     CameraMovement cameraMovement;
 
+    [Header("Particle systems")]
+    [SerializeField]
+    ParticleSystem runPS;
+
+    [SerializeField]
+    ParticleSystem startRunPS;
+
+    [SerializeField]
+    ParticleSystem landPS;
+
     private Vector3 groundNormal = Vector3.up;
     private const float JumpCD = 0.1f;
     private float timeSinceLastJump = 0f;
     private float timeSincePressedSpace = 0f;
+
+    ParticleSystem.EmissionModule runPSEmission;
 
     bool flying = false;
 
@@ -147,6 +159,9 @@ public class PlayerMovement : MonoBehaviour, IMovement
 
     IEnumerator addingForce = null;
 
+    Vector3 previousPosition = Vector3.zero;
+    bool previousGrounded = true;
+
     #endregion
 
     private void Awake()
@@ -155,12 +170,16 @@ public class PlayerMovement : MonoBehaviour, IMovement
         animator = GetComponentInChildren<Animator>();
         col = GetComponent<CapsuleCollider>();
 
+        runPS?.transform.SetParent(null);
+        runPSEmission = runPS.emission;
+
         startPosition = transform.position;
     }
 
     private void Start()
     {
         cameraRotationTransform = cameraMovement.GetRotationTransform();
+        previousPosition = transform.position;
     }
 
     void Update()
@@ -181,6 +200,18 @@ public class PlayerMovement : MonoBehaviour, IMovement
             if (grounded) flying = false;
             if (Input.GetKeyUp(KeyCode.Space)) flying = false;
         }
+
+        if (previousGrounded != grounded && grounded)
+        {
+            var ps = Instantiate(landPS);
+            ps.transform.position = transform.position;
+            Destroy(ps, 2f);
+        }
+
+        runPSEmission.enabled = grounded && (transform.position - previousPosition).magnitude > 0f && Input.GetKey(KeyCode.LeftShift);
+        runPS.transform.position = transform.position;
+
+        previousGrounded = grounded;
     }
 
     private void FixedUpdate()
@@ -192,15 +223,20 @@ public class PlayerMovement : MonoBehaviour, IMovement
         UpdateRotation (Vector3.ProjectOnPlane (Camera.main.transform.forward, groundNormal).normalized);
 
         if (Input.GetKey(KeyCode.LeftShift)) input *= sprintMultiplier;
-        if (!grounded) body.AddForce(flying ? Vector3.down * 3f : Vector3.down * 75f);
+        if (!grounded) body.AddForce(flying ? Vector3.down * 3f * (body.velocity.y > 1f ? body.velocity.y : 1f)  : Vector3.down * 75f);
         else body.AddForce (-transform.up * 20f);
 
         body.MovePosition (body.position + (input * Time.fixedDeltaTime * 0.05f));
 
-        animator?.SetFloat("Speed", body.velocity.magnitude / 12f);
+        animator?.SetFloat("Speed", (transform.position - previousPosition).magnitude);
+        animator?.SetFloat("SprintMulti", Input.GetKey(KeyCode.LeftShift) ? 1.5f : 1f);
+        animator?.SetBool("Grounded", grounded);
+        animator?.SetBool("Flying", flying);
 
         AddDrag();
         ProjectVelocityIfGrounded();
+
+        previousPosition = transform.position;
     }
 
     void Jump()
