@@ -20,17 +20,30 @@ public class PlayerMovement : MonoBehaviour, IMovement
     [SerializeField]
     float turnspeed = 30f;
 
+    [Header("Jumping variables")]
+    [SerializeField]
+    float jumpStrength = 200f;
+
+    [Header("Flight")]
+    [SerializeField]
+    float inputHoldTime = 0.5f;
+
     [Header("Camera")]
     [SerializeField]
     CameraMovement cameraMovement;
 
     private Vector3 groundNormal = Vector3.up;
+    private const float JumpCD = 0.1f;
+    private float timeSinceLastJump = 0f;
+    private float timeSincePressedSpace = 0f;
+
+    bool flying = false;
 
     public Vector3 GroundNormal
     {
         get
         {
-            float dist = col.height / 2f * 1.025f;
+            float dist = col.height / 2f * 1.1f;
             Vector3 position = transform.TransformPoint(col.center);
             Debug.DrawRay(position, -transform.up * dist);
             RaycastHit hit;
@@ -150,6 +163,26 @@ public class PlayerMovement : MonoBehaviour, IMovement
         cameraRotationTransform = cameraMovement.GetRotationTransform();
     }
 
+    void Update()
+    {
+        if (Input.GetKeyDown(KeyCode.Space))
+        {
+            Jump();
+            timeSincePressedSpace = Time.timeSinceLevelLoad;
+        }
+
+        if (!grounded && Input.GetKey(KeyCode.Space) && Time.timeSinceLevelLoad - timeSincePressedSpace > inputHoldTime)
+        {
+            flying = true;
+        }
+
+        if (flying)
+        {
+            if (grounded) flying = false;
+            if (Input.GetKeyUp(KeyCode.Space)) flying = false;
+        }
+    }
+
     private void FixedUpdate()
     {
         groundNormal = GroundNormal;
@@ -158,10 +191,8 @@ public class PlayerMovement : MonoBehaviour, IMovement
 
         UpdateRotation (Vector3.ProjectOnPlane (Camera.main.transform.forward, groundNormal).normalized);
 
-        //if (Slowed) input *= 0.1f;
         if (Input.GetKey(KeyCode.LeftShift)) input *= sprintMultiplier;
-        //if (locks <= 0) body.AddForce(input);
-        if (!grounded) body.AddForce(Vector3.down * 75f);
+        if (!grounded) body.AddForce(flying ? Vector3.down * 3f : Vector3.down * 75f);
         else body.AddForce (-transform.up * 20f);
 
         body.MovePosition (body.position + (input * Time.fixedDeltaTime * 0.05f));
@@ -172,19 +203,28 @@ public class PlayerMovement : MonoBehaviour, IMovement
         ProjectVelocityIfGrounded();
     }
 
+    void Jump()
+    {
+        if (grounded && Time.timeSinceLevelLoad - timeSinceLastJump > JumpCD)
+        {
+            body.AddForce(transform.up * jumpStrength);
+            timeSinceLastJump = Time.timeSinceLevelLoad;
+        }
+    }
+
     void AddDrag()
     {
-        float estimated = 100f;
-        float multi = Mathf.Clamp01(body.velocity.sqrMagnitude / (estimated * estimated));
-        float drag = 1f - Mathf.Pow(multi, dragExponent);
-        //Debug.Log (drag);
-        Vector3 vel = body.velocity;
-        vel.x *= drag;
-        vel.z *= drag;
-        body.velocity = vel;
+        if (grounded)
+        {
+            float estimated = 100f;
+            float multi = Mathf.Clamp01(body.velocity.sqrMagnitude / (estimated * estimated));
+            float drag = 1f - Mathf.Pow(multi, dragExponent);
+            //Debug.Log (drag);
+            body.velocity *= drag;
 
-        //Debug.Log (body.velocity.magnitude);
-        if (body.velocity.magnitude < 0.1f) body.velocity = Vector3.zero;
+            //Debug.Log (body.velocity.magnitude);
+            if (body.velocity.magnitude < 0.1f) body.velocity = Vector3.zero;
+        }
     }
 
     void ProjectVelocityIfGrounded()
