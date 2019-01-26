@@ -24,11 +24,12 @@ public class PlayerMovement : MonoBehaviour, IMovement
     [SerializeField]
     CameraMovement cameraMovement;
 
+    private Vector3 groundNormal = Vector3.up;
+
     public Vector3 GroundNormal
     {
         get
         {
-            Vector3 normal = Vector3.up;
             float dist = col.height / 2f * 1.025f;
             Vector3 position = transform.TransformPoint(col.center);
             Debug.DrawRay(position, -transform.up * dist);
@@ -65,14 +66,15 @@ public class PlayerMovement : MonoBehaviour, IMovement
                 if (Physics.Raycast(position + offset, -transform.up * dist, out hit, dist, Physics.AllLayers & ~LayerMask.GetMask("Weapon"), QueryTriggerInteraction.Ignore))
                 {
                     hitGround = true;
-                    normal = hit.normal;
+                    groundNormal = hit.normal;
                     break;
                 }
             }
 
             grounded = hitGround;
+            if ( !grounded ) groundNormal = Vector3.up;
 
-            return normal;
+            return groundNormal;
         }
     }
 
@@ -91,13 +93,13 @@ public class PlayerMovement : MonoBehaviour, IMovement
                     break;
                 case CameraMovement.Mode.ThirdPerson:
 
-                    i = ProjectVectorRotated(i, rotationTransform.rotation);
+                    i = transform.rotation * i;
 
 
                     break;
                 case CameraMovement.Mode.FirstPerson:
 
-                    i = ProjectVectorRotated(i, rotationTransform.rotation);
+                    i = ProjectVectorRotated(i, cameraRotationTransform.rotation);
 
                     break;
                 default:
@@ -138,11 +140,11 @@ public class PlayerMovement : MonoBehaviour, IMovement
     {
         get
         {
-            return UnityEngine.Input.GetKey (KeyCode.LeftShift);
+            return Input.GetKey (KeyCode.LeftShift);
         }
     }
 
-    Transform rotationTransform;
+    Transform cameraRotationTransform;
 
     int locks = 0;
     Vector3 lockForward = Vector3.zero;
@@ -169,19 +171,25 @@ public class PlayerMovement : MonoBehaviour, IMovement
         Slowed = false;
         Sprinting = false;
 
-        rotationTransform = cameraMovement.GetRotationTransform();
+        cameraRotationTransform = cameraMovement.GetRotationTransform();
     }
 
     private void FixedUpdate()
     {
+        groundNormal = GroundNormal;
+
         Vector3 input = InputVector;
 
-        UpdateRotation(Vector3.ProjectOnPlane(input, Vector3.up));
+        UpdateRotation(Vector3.ProjectOnPlane(cameraRotationTransform.forward, groundNormal).normalized);
+
+        Sprinting = SprintInputActive;
 
         if (Slowed) input *= 0.1f;
         else if (Sprinting) input *= sprintMultiplier;
         if (locks <= 0) body.AddForce(input);
         if (!grounded) body.AddForce(Vector3.down * 75f);
+
+        body.AddForce (-transform.up * 20f);
 
         animator?.SetFloat("Speed", body.velocity.magnitude / 12f);
 
@@ -218,12 +226,12 @@ public class PlayerMovement : MonoBehaviour, IMovement
 
     void ProjectVelocityIfGrounded()
     {
-        if (grounded) body.velocity = Vector3.ProjectOnPlane(body.velocity, GroundNormal).normalized * body.velocity.magnitude;
+        if (grounded) body.velocity = Vector3.ProjectOnPlane(body.velocity, groundNormal).normalized * body.velocity.magnitude;
     }
 
     Vector3 ProjectVectorRotated(Vector3 vector, Quaternion rotation)
     {
-        return Vector3.ProjectOnPlane(rotation * vector, GroundNormal).normalized * vector.magnitude;
+        return Vector3.ProjectOnPlane(rotation * vector, groundNormal).normalized * vector.magnitude;
     }
 
     void UpdateRotation(Vector3 forward)
@@ -231,9 +239,9 @@ public class PlayerMovement : MonoBehaviour, IMovement
         if (forward.sqrMagnitude < 0.1f) return;
 
         var a = body.rotation;
-        var b = Quaternion.LookRotation(locks > 0 ? lockForward : forward, GroundNormal);
+        var b = Quaternion.LookRotation(locks > 0 ? lockForward : forward, groundNormal);
         var ang = Quaternion.Angle(a, b) / 180;
-        body.MoveRotation(Quaternion.RotateTowards(a, b, Mathf.Lerp(1f, 20f, ang * ang) * turnspeed * Time.fixedDeltaTime));
+        body.MoveRotation(b);
         //transform.localRotation = Quaternion.RotateTowards(a, b, Mathf.Clamp(0.3f, 1f, ang) * turnspeed * Time.fixedDeltaTime); //Quaternion.SlerpUnclamped (transform.localRotation, Quaternion.LookRotation (locks > 0 ? lockForward : forward, Vector3.up), turnspeed * Time.fixedDeltaTime);
     }
 
