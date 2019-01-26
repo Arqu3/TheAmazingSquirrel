@@ -43,13 +43,13 @@ public class PlayerMovement : MonoBehaviour, IMovement
     {
         get
         {
-            float dist = col.height / 2f * 1.1f;
+            float dist = col.height / 2f * 1.1f * transform.lossyScale.y;
             Vector3 position = transform.TransformPoint(col.center);
             Debug.DrawRay(position, -transform.up * dist);
             RaycastHit hit;
 
             Vector3 offset = Vector3.zero;
-            float offsetDist = col.radius;
+            float offsetDist = col.radius * transform.lossyScale.x;
 
             bool hitGround = false;
 
