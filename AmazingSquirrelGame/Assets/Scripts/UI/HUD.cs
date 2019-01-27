@@ -15,28 +15,28 @@ public class HUD : MonoBehaviour
 
     public readonly UnityEvent onGameFinished = new UnityEvent();
 
+    Player player;
+
     string timeFormat;
     string foodFormat;
-
-    private CollectableFood[] availableFood;
 
     private void Awake()
     {
         Current = this;
 
+        player = FindObjectOfType<Player>();
+
         timeFormat = timeText.text;
         foodFormat = foodText.text;
-
-        availableFood = FindObjectsOfType<CollectableFood>();
 
         UpdateFood(0);
     }
 
     public void UpdateFood(int amount)
     {
-        foodText.text = string.Format(foodFormat, amount, availableFood.Length);
+        foodText.text = string.Format(foodFormat, amount, player.foodRequried);
 
-        if (amount >= availableFood.Length) onGameFinished.Invoke();
+        if (amount >= player.foodRequried) onGameFinished.Invoke();
     }
 
     public void UpdateTime(float secondsRemaining)
@@ -49,10 +49,5 @@ public class HUD : MonoBehaviour
         string minutes = ((int)secondsRemaining / 60).ToString();
         string seconds = ((int)secondsRemaining % 60).ToString("00");
         return minutes + ":" + seconds;
-    }
-
-    public int GetAvailableFoodCount()
-    {
-        return availableFood.Length;
     }
 }
