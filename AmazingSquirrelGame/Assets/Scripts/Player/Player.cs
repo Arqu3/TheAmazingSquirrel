@@ -11,6 +11,10 @@ public class Player : MonoBehaviour, ICollector
     [SerializeField]
     float interactRange = 10f;
 
+    [Header("Game variables")]
+    public float time = 600f;
+    public int foodRequried = 20;
+
     #endregion
 
     private List<ICollectable> heldCollectables = new List<ICollectable> ();
@@ -27,7 +31,7 @@ public class Player : MonoBehaviour, ICollector
 
     void Update()
     {
-        if (Input.GetKey(KeyCode.LeftShift) && Input.GetKeyDown(KeyCode.Escape))
+        if (Input.GetKeyDown(KeyCode.Escape))
         {
             Debug.Log("Quit");
             Application.Quit();

@@ -43,7 +43,7 @@ public class EndScreen : MonoBehaviour
 
         gameObject.SetActive(true);
         Time.timeScale = 0f;
-        gatheredText.text = string.Format(gatheredFormat, FindObjectOfType<Player>().GetFoodCount(), HUD.Current?.GetAvailableFoodCount());
+        gatheredText.text = string.Format(gatheredFormat, FindObjectOfType<Player>().GetFoodCount(), FindObjectOfType<Player>().foodRequried);
         timeRemainingText.text = string.Format(timeRemainingFormat, HUD.FormatAsTime(TimeManager.Instance.GetRemainingTime()));
     }
 }
