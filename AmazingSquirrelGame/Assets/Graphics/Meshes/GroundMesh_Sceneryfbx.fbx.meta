@@ -1,16 +1,15 @@
 fileFormatVersion: 2
-guid: a3e23a410320c6346a29a4b34264a97b
+guid: ccca7f3f24972c64d90ad43ec740a382
 ModelImporter:
   serializedVersion: 23
   fileIDToRecycleName:
     100000: //RootNode
     400000: //RootNode
-    2100000: No Name
+    2100000: Scenery
+    2100002: Water
     2300000: //RootNode
     3300000: //RootNode
-    4300000: Plane.001
-    4300002: Plane.002
-    4300004: Plane.006
+    4300000: Plane.009
   externalObjects: {}
   materials:
     importMaterials: 0
@@ -73,7 +72,7 @@ ModelImporter:
     legacyComputeAllNormalsFromSmoothingGroupsWhenMeshHasBlendShapes: 0
     blendShapeNormalImportMode: 1
     normalSmoothingSource: 0
-  importAnimation: 0
+  importAnimation: 1
   copyAvatar: 0
   humanDescription:
     serializedVersion: 2
