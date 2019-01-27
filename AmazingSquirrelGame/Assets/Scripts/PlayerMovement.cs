@@ -42,6 +42,10 @@ public class PlayerMovement : MonoBehaviour, IMovement
     [SerializeField]
     ParticleSystem landPS;
 
+    [Header("Mesh to move transform")]
+    [SerializeField]
+    Transform meshTransform;
+
     private Vector3 groundNormal = Vector3.up;
     private const float JumpCD = 0.1f;
     private float timeSinceLastJump = 0f;
@@ -174,6 +178,8 @@ public class PlayerMovement : MonoBehaviour, IMovement
         runPSEmission = runPS.emission;
 
         startPosition = transform.position;
+
+        meshTransform.SetParent(null);
     }
 
     private void Start()
@@ -211,18 +217,32 @@ public class PlayerMovement : MonoBehaviour, IMovement
         runPSEmission.enabled = grounded && (transform.position - previousPosition).magnitude > 0f && Input.GetKey(KeyCode.LeftShift);
         runPS.transform.position = transform.position;
 
+        meshTransform.position = transform.position;
+        meshTransform.rotation = Quaternion.RotateTowards(meshTransform.rotation, transform.rotation, 300f * Time.deltaTime);
+
         previousGrounded = grounded;
     }
 
     private void FixedUpdate()
     {
-        groundNormal = GroundNormal;
-
         Vector3 input = InputVector;
+        groundNormal = GroundNormal;
+        //This even necessary???
+        if (groundNormal.x > -0.1f && groundNormal.x < 0.1f && groundNormal.y > 0.9f && groundNormal.z > -0.1f && groundNormal.z < 0.1f)
+        {
+            RaycastHit hit;
+            float dist = 1f;
+            Vector3 direction = input.sqrMagnitude > 0f ? input : transform.position - previousPosition;
+            if (Physics.Raycast(transform.position, direction * dist * transform.lossyScale.x, out hit, dist, Physics.AllLayers, QueryTriggerInteraction.Ignore))
+            {
+                if (hit.transform.gameObject != gameObject)
+                groundNormal = hit.normal;
+            }
+        }
 
         UpdateRotation (Vector3.ProjectOnPlane (Camera.main.transform.forward, groundNormal).normalized);
 
-        if (Input.GetKey(KeyCode.LeftShift)) input *= sprintMultiplier;
+        if (Input.GetKey(KeyCode.LeftShift) && grounded) input *= sprintMultiplier;
         if (!grounded) body.AddForce(flying ? Vector3.down * 3f * (body.velocity.y > 1f ? body.velocity.y : 1f)  : Vector3.down * 75f);
         else body.AddForce (-transform.up * 20f);
 
@@ -277,9 +297,9 @@ public class PlayerMovement : MonoBehaviour, IMovement
     {
         if (forward.sqrMagnitude < 0.1f) return;
 
-        var a = body.rotation;
+        //var a = body.rotation;
         var b = Quaternion.LookRotation(locks > 0 ? lockForward : forward, groundNormal);
-        var ang = Quaternion.Angle(a, b) / 180;
+        //var ang = Quaternion.Angle(a, b) / 180;
         body.MoveRotation(b);
         //transform.localRotation = Quaternion.RotateTowards(a, b, Mathf.Clamp(0.3f, 1f, ang) * turnspeed * Time.fixedDeltaTime); //Quaternion.SlerpUnclamped (transform.localRotation, Quaternion.LookRotation (locks > 0 ? lockForward : forward, Vector3.up), turnspeed * Time.fixedDeltaTime);
     }
