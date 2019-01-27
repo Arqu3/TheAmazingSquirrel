@@ -17,6 +17,8 @@ public abstract class CollectableObject : MonoBehaviour, ICollectable
 
     protected virtual void OnTriggerEnter(Collider col)
     {
+        if (!gameObject.activeInHierarchy) return;
+
         var collector = col.GetComponent<ICollector> ();
         if (collector != null)
         {
