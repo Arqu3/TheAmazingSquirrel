@@ -52,7 +52,7 @@ public class CameraMovement : MonoBehaviour
     {
         get
         {
-            return locks > 0 ? Vector2.zero : new Vector2(-Input.GetAxis("Mouse Y") * sensitivity.y, Input.GetAxis("Mouse X") * sensitivity.x) * Time.unscaledDeltaTime;
+            return locks > 0 ? Vector2.zero : new Vector2(-Input.GetAxis("Mouse Y") * sensitivity.y, Input.GetAxis("Mouse X") * sensitivity.x) * (Time.timeScale > 0f ? Time.unscaledDeltaTime : 0f);
         }
     }
 

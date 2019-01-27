@@ -211,7 +211,7 @@ public class PlayerMovement : MonoBehaviour, IMovement
         {
             var ps = Instantiate(landPS);
             ps.transform.position = transform.position;
-            Destroy(ps, 2f);
+            Destroy(ps.gameObject, 2f);
         }
 
         runPSEmission.enabled = grounded && (transform.position - previousPosition).magnitude > 0f && Input.GetKey(KeyCode.LeftShift);
@@ -237,7 +237,7 @@ public class PlayerMovement : MonoBehaviour, IMovement
                 groundNormal = hit.normal;
         }
 
-        UpdateRotation (Vector3.ProjectOnPlane (Camera.main.transform.forward, groundNormal).normalized);
+        UpdateRotation (Vector3.ProjectOnPlane (input.sqrMagnitude > 0f ? Camera.main.transform.forward : transform.forward, groundNormal).normalized);
 
         if (Input.GetKey(KeyCode.LeftShift) && grounded) input *= sprintMultiplier;
         if (!grounded) body.AddForce(flying ? Vector3.down * 3f * (body.velocity.y > 1f ? body.velocity.y : 1f)  : Vector3.down * 75f);

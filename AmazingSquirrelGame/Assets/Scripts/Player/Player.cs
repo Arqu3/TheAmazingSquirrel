@@ -18,8 +18,21 @@ public class Player : MonoBehaviour, ICollector
     private const float InteractCD = 0.5f;
     float timeSinceLastInteract = 0.0f;
 
+    void Start()
+    {
+        TimeManager.Instance.ResetData();
+        Cursor.lockState = CursorLockMode.Locked;
+        Cursor.visible = false;
+    }
+
     void Update()
     {
+        if (Input.GetKey(KeyCode.LeftShift) && Input.GetKeyDown(KeyCode.Escape))
+        {
+            Debug.Log("Quit");
+            Application.Quit();
+        }
+
         if (Input.GetMouseButtonDown(0) && (Time.timeSinceLevelLoad - timeSinceLastInteract > InteractCD))
         {
             var colliders = Physics.OverlapSphere (transform.position, interactRange);
@@ -41,10 +54,16 @@ public class Player : MonoBehaviour, ICollector
         if ( !heldCollectables.Contains (collectable) )
         {
             heldCollectables.Add (collectable);
+            if (collectable as CollectableFood) HUD.Current.UpdateFood(heldCollectables.Count);
         }
     }
 
     #endregion
+
+    public int GetFoodCount()
+    {
+        return heldCollectables.Select(x => x as CollectableFood != null).Count();
+    }
 
 #if UNITY_EDITOR
 
