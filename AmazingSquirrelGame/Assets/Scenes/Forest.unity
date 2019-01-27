@@ -4645,22 +4645,37 @@ PrefabInstance:
     - target: {fileID: 3470181320141513187, guid: 280eebbb6896ed448abbc1bb0ab2ffcf,
         type: 3}
       propertyPath: m_LocalScale.x
-      value: 0.2
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 3470181320141513187, guid: 280eebbb6896ed448abbc1bb0ab2ffcf,
         type: 3}
       propertyPath: m_LocalScale.y
-      value: 0.2
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 3470181320141513187, guid: 280eebbb6896ed448abbc1bb0ab2ffcf,
         type: 3}
       propertyPath: m_LocalScale.z
-      value: 0.2
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 1976783649983657281, guid: 280eebbb6896ed448abbc1bb0ab2ffcf,
         type: 3}
       propertyPath: m_ForceIntoRT
       value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 3472210927119484785, guid: 280eebbb6896ed448abbc1bb0ab2ffcf,
+        type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 746750910823007915, guid: 280eebbb6896ed448abbc1bb0ab2ffcf,
+        type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6297095606444959603, guid: 280eebbb6896ed448abbc1bb0ab2ffcf,
+        type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 3470181320141513186, guid: 280eebbb6896ed448abbc1bb0ab2ffcf,
         type: 3}
@@ -10004,7 +10019,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &1527937510
 Transform:
   m_ObjectHideFlags: 0
