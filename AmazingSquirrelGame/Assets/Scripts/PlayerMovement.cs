@@ -227,17 +227,14 @@ public class PlayerMovement : MonoBehaviour, IMovement
     {
         Vector3 input = InputVector;
         groundNormal = GroundNormal;
-        //This even necessary???
-        if (groundNormal.x > -0.1f && groundNormal.x < 0.1f && groundNormal.y > 0.9f && groundNormal.z > -0.1f && groundNormal.z < 0.1f)
+
+        RaycastHit hit;
+        float dist = 1f;
+        Vector3 direction = input.sqrMagnitude > 0f ? input : transform.position - previousPosition;
+        if (Physics.Raycast(transform.position, direction * dist * transform.lossyScale.x, out hit, dist, Physics.AllLayers, QueryTriggerInteraction.Ignore))
         {
-            RaycastHit hit;
-            float dist = 1f;
-            Vector3 direction = input.sqrMagnitude > 0f ? input : transform.position - previousPosition;
-            if (Physics.Raycast(transform.position, direction * dist * transform.lossyScale.x, out hit, dist, Physics.AllLayers, QueryTriggerInteraction.Ignore))
-            {
-                if (hit.transform.gameObject != gameObject)
+            if (hit.transform.gameObject != gameObject)
                 groundNormal = hit.normal;
-            }
         }
 
         UpdateRotation (Vector3.ProjectOnPlane (Camera.main.transform.forward, groundNormal).normalized);
