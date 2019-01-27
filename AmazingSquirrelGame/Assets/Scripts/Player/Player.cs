@@ -11,10 +11,6 @@ public class Player : MonoBehaviour, ICollector
     [SerializeField]
     float interactRange = 10f;
 
-    [Header("Game variables")]
-    public float time = 600f;
-    public int foodRequried = 20;
-
     #endregion
 
     private List<ICollectable> heldCollectables = new List<ICollectable> ();

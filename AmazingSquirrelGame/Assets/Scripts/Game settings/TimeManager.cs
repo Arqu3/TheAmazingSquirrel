@@ -8,18 +8,15 @@ public class TimeManager : Singleton<TimeManager>
 
     bool timeOut = false;
 
-    Player player;
-
     public void ResetData()
     {
-        player = FindObjectOfType<Player>();
         timer = 0.0f;
         timeOut = false;
     }
 
     public float GetRemainingTime()
     {
-        return player.time - timer;
+        return 600f - timer;
     }
 
     private void Update()
