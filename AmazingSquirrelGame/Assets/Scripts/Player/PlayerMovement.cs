@@ -48,6 +48,8 @@ public class PlayerMovement : MonoBehaviour, IMovement
 
     private Vector3 groundNormal = Vector3.up;
     private const float JumpCD = 0.1f;
+    private const float NormalChangeCD = 0.3f;
+    private float timeSinceLastNormalChange = 0f;
     private float timeSinceLastJump = 0f;
     private float timeSincePressedSpace = 0f;
 
@@ -122,7 +124,9 @@ public class PlayerMovement : MonoBehaviour, IMovement
                     break;
                 case CameraMovement.Mode.ThirdPerson:
 
-                    i = transform.rotation * i;
+                    i = ProjectVectorRotated(i, cameraRotationTransform.rotation);
+
+                    if (Vector3.Dot(cameraRotationTransform.forward, body.transform.forward) < -0.8f) i = Quaternion.Euler(0f, 180f, 0f) * i;
 
                     break;
                 case CameraMovement.Mode.FirstPerson:
@@ -218,7 +222,7 @@ public class PlayerMovement : MonoBehaviour, IMovement
         runPS.transform.position = transform.position;
 
         meshTransform.position = transform.position;
-        meshTransform.rotation = Quaternion.RotateTowards(meshTransform.rotation, transform.rotation, 300f * Time.deltaTime);
+        meshTransform.rotation = Quaternion.RotateTowards(meshTransform.rotation, transform.rotation, turnspeed * Time.deltaTime);
 
         previousGrounded = grounded;
     }
@@ -230,20 +234,30 @@ public class PlayerMovement : MonoBehaviour, IMovement
 
         RaycastHit hit;
         float dist = 1f;
-        Vector3 direction = input.sqrMagnitude > 0f ? input : transform.position - previousPosition;
-        if (Physics.Raycast(transform.position, direction * dist * transform.lossyScale.x, out hit, dist, Physics.AllLayers, QueryTriggerInteraction.Ignore))
+        Vector3 direction = input.sqrMagnitude > 0f ?
+            input :
+            body.velocity.sqrMagnitude > 0f ?
+            transform.position - previousPosition :
+            Vector3.ProjectOnPlane(Camera.main.transform.forward, groundNormal);
+
+        if (Physics.Raycast(transform.position, direction.normalized * dist * transform.lossyScale.x, out hit, dist, Physics.AllLayers, QueryTriggerInteraction.Ignore))
         {
-            if (hit.transform.gameObject != gameObject)
+            if (hit.transform.gameObject != gameObject && Time.timeSinceLevelLoad - timeSinceLastNormalChange > NormalChangeCD)
+            {
                 groundNormal = hit.normal;
+                timeSinceLastNormalChange = Time.timeSinceLevelLoad;
+            }
         }
 
-        UpdateRotation (Vector3.ProjectOnPlane (input.sqrMagnitude > 0f ? Camera.main.transform.forward : transform.forward, groundNormal).normalized);
+        UpdateRotation (Vector3.ProjectOnPlane (input.sqrMagnitude > 0f ? input : transform.forward, groundNormal).normalized);
 
         if (Input.GetKey(KeyCode.LeftShift) && grounded) input *= sprintMultiplier;
-        if (!grounded) body.AddForce(flying ? Vector3.down * 3f * (body.velocity.y > 1f ? body.velocity.y : 1f)  : Vector3.down * 75f);
+        if (!grounded) body.AddForce(flying ? Vector3.down * 10f : Vector3.down * 75f);
         else body.AddForce (-transform.up * 20f);
 
-        body.MovePosition (body.position + (input * Time.fixedDeltaTime * 0.05f));
+        if (flying) body.AddForce(transform.forward * 5f);
+
+        body.MovePosition (body.position + (input * Time.fixedDeltaTime * (flying ? 0.1f : 0.05f)));
 
         animator?.SetFloat("Speed", (transform.position - previousPosition).magnitude);
         animator?.SetFloat("SprintMulti", Input.GetKey(KeyCode.LeftShift) ? 1.5f : 1f);
@@ -260,7 +274,7 @@ public class PlayerMovement : MonoBehaviour, IMovement
     {
         if (grounded && Time.timeSinceLevelLoad - timeSinceLastJump > JumpCD)
         {
-            body.AddForce(transform.up * jumpStrength);
+            body.AddForce(Vector3.Angle(transform.up, Vector3.up) > 45f ? transform.up * jumpStrength : Vector3.up * jumpStrength);
             timeSinceLastJump = Time.timeSinceLevelLoad;
         }
     }
@@ -272,10 +286,8 @@ public class PlayerMovement : MonoBehaviour, IMovement
             float estimated = 100f;
             float multi = Mathf.Clamp01(body.velocity.sqrMagnitude / (estimated * estimated));
             float drag = 1f - Mathf.Pow(multi, dragExponent);
-            //Debug.Log (drag);
             body.velocity *= drag;
 
-            //Debug.Log (body.velocity.magnitude);
             if (body.velocity.magnitude < 0.1f) body.velocity = Vector3.zero;
         }
     }
@@ -294,11 +306,8 @@ public class PlayerMovement : MonoBehaviour, IMovement
     {
         if (forward.sqrMagnitude < 0.1f) return;
 
-        //var a = body.rotation;
         var b = Quaternion.LookRotation(locks > 0 ? lockForward : forward, groundNormal);
-        //var ang = Quaternion.Angle(a, b) / 180;
         body.MoveRotation(b);
-        //transform.localRotation = Quaternion.RotateTowards(a, b, Mathf.Clamp(0.3f, 1f, ang) * turnspeed * Time.fixedDeltaTime); //Quaternion.SlerpUnclamped (transform.localRotation, Quaternion.LookRotation (locks > 0 ? lockForward : forward, Vector3.up), turnspeed * Time.fixedDeltaTime);
     }
 
     public Coroutine AddForceDirectional(float strength, float duration, Vector3 dir)

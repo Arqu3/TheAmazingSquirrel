@@ -2214,21 +2214,6 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
-    - target: {fileID: 3472210927119484785, guid: 280eebbb6896ed448abbc1bb0ab2ffcf,
-        type: 3}
-      propertyPath: m_LocalPosition.z
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 5665967306845156759, guid: 280eebbb6896ed448abbc1bb0ab2ffcf,
-        type: 3}
-      propertyPath: m_AdditionalShaderChannelsFlag
-      value: 25
-      objectReference: {fileID: 0}
-    - target: {fileID: 5972693879017863614, guid: 280eebbb6896ed448abbc1bb0ab2ffcf,
-        type: 3}
-      propertyPath: m_inputSource
-      value: 0
-      objectReference: {fileID: 0}
     - target: {fileID: 5972693879017863614, guid: 280eebbb6896ed448abbc1bb0ab2ffcf,
         type: 3}
       propertyPath: m_havePropertiesChanged
@@ -2249,57 +2234,12 @@ PrefabInstance:
       propertyPath: m_isInputParsingRequired
       value: 1
       objectReference: {fileID: 0}
-    - target: {fileID: 746750910823007915, guid: 280eebbb6896ed448abbc1bb0ab2ffcf,
-        type: 3}
-      propertyPath: m_LocalPosition.z
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 3760955472972257306, guid: 280eebbb6896ed448abbc1bb0ab2ffcf,
+    - target: {fileID: 1842349122144803393, guid: 280eebbb6896ed448abbc1bb0ab2ffcf,
         type: 3}
       propertyPath: m_havePropertiesChanged
       value: 1
       objectReference: {fileID: 0}
-    - target: {fileID: 3760955472972257306, guid: 280eebbb6896ed448abbc1bb0ab2ffcf,
-        type: 3}
-      propertyPath: m_isInputParsingRequired
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 8374511781636393637, guid: 280eebbb6896ed448abbc1bb0ab2ffcf,
-        type: 3}
-      propertyPath: m_havePropertiesChanged
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 8374511781636393637, guid: 280eebbb6896ed448abbc1bb0ab2ffcf,
-        type: 3}
-      propertyPath: m_isInputParsingRequired
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 6918217595232393343, guid: 280eebbb6896ed448abbc1bb0ab2ffcf,
-        type: 3}
-      propertyPath: m_inputSource
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 6918217595232393343, guid: 280eebbb6896ed448abbc1bb0ab2ffcf,
-        type: 3}
-      propertyPath: m_havePropertiesChanged
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 6918217595232393343, guid: 280eebbb6896ed448abbc1bb0ab2ffcf,
-        type: 3}
-      propertyPath: m_isInputParsingRequired
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 6297095606444959603, guid: 280eebbb6896ed448abbc1bb0ab2ffcf,
-        type: 3}
-      propertyPath: m_LocalPosition.z
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 7017788281492197946, guid: 280eebbb6896ed448abbc1bb0ab2ffcf,
-        type: 3}
-      propertyPath: m_havePropertiesChanged
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 7017788281492197946, guid: 280eebbb6896ed448abbc1bb0ab2ffcf,
+    - target: {fileID: 1842349122144803393, guid: 280eebbb6896ed448abbc1bb0ab2ffcf,
         type: 3}
       propertyPath: m_isInputParsingRequired
       value: 1
@@ -2314,12 +2254,22 @@ PrefabInstance:
       propertyPath: m_isInputParsingRequired
       value: 1
       objectReference: {fileID: 0}
-    - target: {fileID: 1842349122144803393, guid: 280eebbb6896ed448abbc1bb0ab2ffcf,
+    - target: {fileID: 6918217595232393343, guid: 280eebbb6896ed448abbc1bb0ab2ffcf,
         type: 3}
       propertyPath: m_havePropertiesChanged
       value: 1
       objectReference: {fileID: 0}
-    - target: {fileID: 1842349122144803393, guid: 280eebbb6896ed448abbc1bb0ab2ffcf,
+    - target: {fileID: 6918217595232393343, guid: 280eebbb6896ed448abbc1bb0ab2ffcf,
+        type: 3}
+      propertyPath: m_isInputParsingRequired
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 7017788281492197946, guid: 280eebbb6896ed448abbc1bb0ab2ffcf,
+        type: 3}
+      propertyPath: m_havePropertiesChanged
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 7017788281492197946, guid: 280eebbb6896ed448abbc1bb0ab2ffcf,
         type: 3}
       propertyPath: m_isInputParsingRequired
       value: 1
