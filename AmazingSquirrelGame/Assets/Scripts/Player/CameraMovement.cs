@@ -131,7 +131,7 @@ public class CameraMovement : MonoBehaviour
         transform.SetParent(null, true);
     }
 
-    private void LateUpdate()
+    private void FixedUpdate()
     {
         if (mode == Mode.Static)
         {
@@ -158,9 +158,8 @@ public class CameraMovement : MonoBehaviour
                     Vector3 dir = (followTransform.position + followTransform.rotation * defaultOffset) - followTransform.position;
                     if (Physics.Raycast(followTransform.position, dir, out hit, dir.magnitude,
                         Physics.AllLayers 
-                        & ~LayerMask.GetMask("Player") 
-                        & ~LayerMask.GetMask("Weapon")
-                        & ~LayerMask.GetMask("WeaponHitbox"), QueryTriggerInteraction.Ignore))
+                        & ~LayerMask.GetMask("Player"),
+                        QueryTriggerInteraction.Ignore))
                         currentOffset = followTransform.InverseTransformPoint(hit.point);
                     else currentOffset = defaultOffset;
                     break;
@@ -170,8 +169,8 @@ public class CameraMovement : MonoBehaviour
                     break;
             }
 
-            transform.position = followTransform.position + followTransform.rotation * currentOffset;
-            transform.localRotation = Quaternion.LookRotation(followTransform.forward, Vector3.up);
+            transform.position = Vector3.Lerp(transform.position, followTransform.position + followTransform.rotation * currentOffset, 30f * Time.fixedDeltaTime);
+            transform.localRotation = Quaternion.Slerp(transform.localRotation, Quaternion.LookRotation(followTransform.forward, Vector3.up), 15f * Time.fixedDeltaTime);
 
             //Used to center camera view even when shaking
             UpdateLookRotation();
@@ -185,7 +184,7 @@ public class CameraMovement : MonoBehaviour
         //Debug.DrawRay(Camera.main.transform.position, Camera.main.transform.forward * dist, Color.red);
 
         Vector3 dir = ( followTransform.position + followTransform.forward * dist ) - Camera.main.transform.position;
-        Camera.main.transform.rotation = Quaternion.LookRotation (dir);
+        Camera.main.transform.rotation = Quaternion.RotateTowards(Camera.main.transform.rotation, Quaternion.LookRotation(dir), 15f * Time.fixedDeltaTime);
 
     }
 

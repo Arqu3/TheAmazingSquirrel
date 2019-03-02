@@ -61,7 +61,7 @@ public class PlayerMovement : MonoBehaviour, IMovement
     {
         get
         {
-            float dist = col.height / 2f * 1.1f * transform.lossyScale.y;
+            float dist = col.height / 2f * 1.3f * transform.lossyScale.y;
             Vector3 position = transform.TransformPoint(col.center);
             Debug.DrawRay(position, -transform.up * dist);
             RaycastHit hit;
@@ -70,6 +70,7 @@ public class PlayerMovement : MonoBehaviour, IMovement
             float offsetDist = col.radius * transform.lossyScale.x;
 
             bool hitGround = false;
+            Vector3 normal = Vector3.up;
 
             for (int i = 0; i < 1; ++i)
             {
@@ -97,15 +98,14 @@ public class PlayerMovement : MonoBehaviour, IMovement
                 if (Physics.Raycast(position + offset, -transform.up * dist, out hit, dist, Physics.AllLayers & ~LayerMask.GetMask("Weapon"), QueryTriggerInteraction.Ignore))
                 {
                     hitGround = true;
-                    groundNormal = hit.normal;
+                    normal = hit.normal;
                     break;
                 }
             }
 
             grounded = hitGround;
-            if ( !grounded ) groundNormal = Vector3.up;
 
-            return groundNormal;
+            return normal;
         }
     }
 
@@ -126,7 +126,7 @@ public class PlayerMovement : MonoBehaviour, IMovement
 
                     i = ProjectVectorRotated(i, cameraRotationTransform.rotation);
 
-                    if (Vector3.Dot(cameraRotationTransform.forward, body.transform.forward) < -0.8f) i = Quaternion.Euler(0f, 180f, 0f) * i;
+                    //if (Vector3.Dot(cameraRotationTransform.forward, body.transform.forward) < -0.8f) i = Quaternion.Euler(0f, 180f, 0f) * i;
 
                     break;
                 case CameraMovement.Mode.FirstPerson:
@@ -230,19 +230,17 @@ public class PlayerMovement : MonoBehaviour, IMovement
     private void FixedUpdate()
     {
         Vector3 input = InputVector;
-        groundNormal = GroundNormal;
+        var g = GroundNormal;
+        groundNormal = Time.timeSinceLevelLoad - timeSinceLastNormalChange > NormalChangeCD ? g : groundNormal;
 
         RaycastHit hit;
         float dist = 1f;
-        Vector3 direction = input.sqrMagnitude > 0f ?
-            input :
-            body.velocity.sqrMagnitude > 0f ?
-            transform.position - previousPosition :
-            Vector3.ProjectOnPlane(Camera.main.transform.forward, groundNormal);
+        Vector3 direction = input.sqrMagnitude > 0.01f ?
+            input : transform.forward;
 
         if (Physics.Raycast(transform.position, direction.normalized * dist * transform.lossyScale.x, out hit, dist, Physics.AllLayers, QueryTriggerInteraction.Ignore))
         {
-            if (hit.transform.gameObject != gameObject && Time.timeSinceLevelLoad - timeSinceLastNormalChange > NormalChangeCD)
+            if (hit.transform.gameObject != gameObject)
             {
                 groundNormal = hit.normal;
                 timeSinceLastNormalChange = Time.timeSinceLevelLoad;
@@ -255,7 +253,7 @@ public class PlayerMovement : MonoBehaviour, IMovement
         if (!grounded) body.AddForce(flying ? Vector3.down * 10f : Vector3.down * 75f);
         else body.AddForce (-transform.up * 20f);
 
-        if (flying) body.AddForce(transform.forward * 5f);
+        if (flying) body.MovePosition(body.position + body.transform.forward * 5f * Time.fixedDeltaTime);
 
         body.MovePosition (body.position + (input * Time.fixedDeltaTime * (flying ? 0.1f : 0.05f)));
 
@@ -264,7 +262,8 @@ public class PlayerMovement : MonoBehaviour, IMovement
         animator?.SetBool("Grounded", grounded);
         animator?.SetBool("Flying", flying);
 
-        AddDrag();
+        AddGroundDrag();
+        AddFlyingDrag();
         ProjectVelocityIfGrounded();
 
         previousPosition = transform.position;
@@ -274,12 +273,12 @@ public class PlayerMovement : MonoBehaviour, IMovement
     {
         if (grounded && Time.timeSinceLevelLoad - timeSinceLastJump > JumpCD)
         {
-            body.AddForce(Vector3.Angle(transform.up, Vector3.up) > 45f ? transform.up * jumpStrength : Vector3.up * jumpStrength);
+            body.AddForce(Vector3.Angle(transform.up, Vector3.up) > 80f ? transform.up * jumpStrength : Vector3.up * jumpStrength);
             timeSinceLastJump = Time.timeSinceLevelLoad;
         }
     }
 
-    void AddDrag()
+    void AddGroundDrag()
     {
         if (grounded)
         {
@@ -289,6 +288,18 @@ public class PlayerMovement : MonoBehaviour, IMovement
             body.velocity *= drag;
 
             if (body.velocity.magnitude < 0.1f) body.velocity = Vector3.zero;
+        }
+    }
+
+    void AddFlyingDrag()
+    {
+        if (flying)
+        {
+            float estimated = 30f;
+            float multi = Mathf.Max(1f - Mathf.Clamp01(Mathf.Abs(body.velocity.y) / estimated), 0.7f);
+            var vel = body.velocity;
+            vel.y *= multi;
+            body.velocity = vel;
         }
     }
 
