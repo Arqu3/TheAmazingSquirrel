@@ -221,7 +221,7 @@ Material:
     - _ZTestModeDistortion: 8
     - _ZWrite: 1
     m_Colors:
-    - Color_D546A418: {r: 1.6880921, g: 6.0628657, b: 0, a: 0}
+    - Color_D546A418: {r: 3.2794054, g: 6.0628653, b: 0, a: 0}
     - _BaseColor: {r: 1, g: 1, b: 1, a: 1}
     - _Color: {r: 1, g: 1, b: 1, a: 1}
     - _DoubleSidedConstants: {r: 1, g: 1, b: -1, a: 0}
